@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="ISO-8859-1" />
+    <title>Books</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body onload="getapi()">
+    <div class="container">
+      <div class="row">
+        <h1>List Books</h1>
+      </div>
+      <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>BookCode</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Approved</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="book-rows"></tbody>
+      </table>
+    </div>
+
+    <script>
+      // api ur
+    
+      // Defining async function
+      async function getapi(url) {
+          // Storing response
+          const response = await fetch(url);
+          // Storing data in form of JSON
+          var data = await response.json();
+          show(data);
+      }
+      // Calling that async function
+      getapi("http://localhost:8080/books");
+    
+      // Function to define innerHTML for HTML table
+      function show(books) {
+          let tab = ``;
+    
+          // Loop to access all rows
+          for (let book of books) {
+              tab += `<tr> 
+                  <td>${book.bookcode} </td>
+                  <td>${book.title}</td>
+                  <td>${book.author}</td> 
+                  <td>${book.category}</td>    
+                <td><input type="checkbox" checked="${book.approved}" /></td>       
+            </tr>`;
+          }
+          // Setting innerHTML as tab variable
+          document.getElementById("book-rows").innerHTML = tab;
+      }
+    </script>
+  </body>
+
+  
+</html>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  // api url
+  const api_url = "http://localhost:8080/books";
+
+  // Defining async function
+  async function getapi(url) {
+    	// Storing response
+    	const response = await fetch(url);
+    	// Storing data in form of JSON
+    	var data = await response.json();
+    	show(data);
+  }
+  // Calling that async function
+  getapi(api_url);
+
+  // Function to define innerHTML for HTML table
+  function show(books) {
+    	let tab = ``;
+
+    	// Loop to access all rows
+    	for (let book of books) {
+      		tab += `<tr> 
+        			<td>${book.bookcode} </td>
+        			<td>${book.title}</td>
+        			<td>${book.author}</td> 
+        			<td>${book.category}</td>    
+      			<td><input type="checkbox" checked="${book.approved}" /></td>       
+    		</tr>`;
+    	}
+    	// Setting innerHTML as tab variable
+    	document.getElementById("book-rows").innerHTML = tab;
+  }
+</script>
+
+
