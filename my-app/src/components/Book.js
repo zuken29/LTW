@@ -1,55 +1,82 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from "axios";
 
-function Book(props) {
-  const params = useParams();
-  const [book, setBook] = useState({});
-  const bookcode = params.bookcode;
-  const onSaveClick = () => {
+function Book() {
+  const [book, setBook] = useState({
+    bookcode: "",
+    title: "",
+    author: "",
+    category: "",
+    sold: false,
+  });
+  const { bookcode } = useParams();
+
+  const navigate = useNavigate();
+
+  const onSaveClick = (event) => {
+    event.preventDefault();
     console.log(book);
     // Send data to the backend via POST
-    fetch(`http://localhost:8080/book/save/${bookcode}`, {
-      method: "POST",
-      mode: "cors",
-      body: JSON.stringify(book), // body data type must match "Content-Type" header
+    fetch(`http://localhost:8080/book/${bookcode}`, {
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json; charset=ISO-8859-1',
-      }
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(book)
     })
-      .then((response) => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Failed to add book");
+        } else {
+          navigate(`/`);
+        }
+      })
       .then((data) => console.log(data))
-      .catch((err) => console.log(err));;
+      .catch(error => {
+        console.error(error);
+      });
+
+
   };
 
   useEffect(() => {
-    fetch(`http://localhost:8080/book/${bookcode}`)
-      .then((response) => response.json())
-      .then((data) => setBook(data))
-      .catch((err) => console.log(err));
-  }, []);
+    axios.get(`http://localhost:8080/book/${bookcode}`)
+      .then(response => {
+        setBook(response.data);
+      })
+      .catch(error =>
+        console.error(error)
+      );
+  }, [bookcode]);
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setBook({ ...book, [name]: value });
+  }
 
   return (
     <div>
       <h1>{bookcode < 0 ? "New Book" : `Book ${bookcode}`}</h1>
+      <br />
       BookCode:{" "}
-      <input type="number" value={book.bookcode}
-        onChange={(e) => setBook({ ...book, bookcode: e.target.value })} />
+      <input type="number" value={book.bookcode} name="bookcode" disabled
+        onChange={handleChange} />
       <br />
       Title:{" "}
-      <input type="text" value={book.title}
-        onChange={(e) => setBook({ ...book, title: e.target.value })} />
+      <input type="text" value={book.title} name="title"
+        onChange={handleChange} />
       <br />
       Author:{" "}
-      <input type="text" value={book.author}
-        onChange={(e) => setBook({ ...book, author: e.target.value })} />
+      <input type="text" value={book.author} name="author"
+        onChange={handleChange} />
       <br />
       Category:{" "}
-      <input type="text" value={book.category}
-        onChange={(e) => setBook({ ...book, category: e.target.value })} />
+      <input type="text" value={book.category} name="category"
+        onChange={handleChange} />
       <br />
       Approved:{" "}
-      <input type="checkbox" checked={book.approved}
-        onChange={(e) => setBook({ ...book, approved: e.target.checked })} />
+      <input type="checkbox" checked={book.sold} name="sold" onChange={handleChange} />
       <br />
       <button onClick={onSaveClick}>Save</button>
     </div>

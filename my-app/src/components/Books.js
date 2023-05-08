@@ -1,30 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 function Books(props) {
   const [books, setBooks] = useState([]);
-  const navigate = useNavigate();
+  //  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("http://localhost:8080/books")
       .then((response) => response.json())
       .then((data) => setBooks(data))
       .catch((err) => console.log(err));
-  }, []); 
+  }, []);
 
-function handleViewDetail(code){
-    navigate("/books/".concat(code));
-}
-
+  function deleteBook(bookCode) {
+    fetch(`http://localhost:8080/books/${bookCode}`, {
+      method: "DELETE",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        // update the books list after deletion
+        setBooks(books.filter((book) => book.bookcode !== bookCode));
+      })
+      .catch((err) => console.log(err));
+  }
   return (
     <div>
       <h2 className="text-center">Books List</h2>
-      <div className="row">
-        <button
-          className="btn btn-primary"
-        >
+      <div className="row add" >
+        <Link to='/add'>
+          <button className="btn btn-primary">
             Add Book
-        </button>
+          </button>
+        </Link>
       </div>
       <div className="row">
         <table className="table table-striped table-bordered">
@@ -50,8 +59,10 @@ function handleViewDetail(code){
                   <input type="checkbox" defaultChecked={book.approved} />
                 </td>
                 <td>
-                <button onClick={()=>handleViewDetail(book.bookcode)} className="btn btn-primary">View</button>
-                <button className="btn btn-danger">Delete</button>
+                  <Link to={`/books/${book.bookcode}`}>
+                    <button className="btn btn-primary">View</button>
+                  </Link>
+                  <button className="btn btn-danger" onClick={() => deleteBook(book.bookcode)}>Delete</button>
                 </td>
               </tr>
             ))}
